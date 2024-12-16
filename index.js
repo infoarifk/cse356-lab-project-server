@@ -33,6 +33,7 @@ async function run() {
 
     const database = client.db("fitnessTracker");
     const subscribeCollection = database.collection("subscribers");
+    const adminInfo = database.collection("admin");
 
   
     //receive data from database
@@ -45,6 +46,15 @@ async function run() {
 
 
 
+    })
+
+    app.get('/admin', async(req,res)=>{
+
+      const cursor = adminInfo.find();
+      const result = await cursor.toArray();
+      res.send(result);
+      
+      
     })
 
     //receive data from client side
