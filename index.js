@@ -30,42 +30,33 @@ async function run() {
   try {
     
     await client.connect();
-    const database = client.db("TestServer");
-    const userCollection = database.collection("users");
 
-    //receive data from mongoDB
-    app.get("/users", async(req, res)=>{
+    const database = client.db("fitnessTracker");
+    const subscribeCollection = database.collection("subscribers");
 
-      const cursor = userCollection.find();
+  
+    //receive data from database
+
+    app.get('/subscribe', async(req,res)=>{
+
+      const cursor = subscribeCollection.find();
       const result = await cursor.toArray();
       res.send(result);
+
+
 
     })
 
     //receive data from client side
-    app.post("/users", async(req, res)=>{
+    app.post('/subscribe', async(req,res)=>{
+      const newSubscribe = req.body;
+      console.log(newSubscribe);
 
-      const user = req.body;
-      console.log("received users: ", user);
-
-      //send data to database
-      const result = await userCollection.insertOne(user);
+      const result = await subscribeCollection.insertOne(newSubscribe);
       res.send(result);
-
-    });
-
-    //delete from database
-
-  app.delete(`/users/:id`, async(req, res)=>{
-
-    const id = req.params.id;
-    const query = {_id : new ObjectId(id)};
-    const result = await userCollection.deleteOne(query);
-    res.send(result);
-
-  })
-    
-    
+      
+    })
+     
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
@@ -79,7 +70,7 @@ run().catch(console.dir);
 //express functionality
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('server is running')
   })
   
   app.listen(port, () => {
